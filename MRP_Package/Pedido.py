@@ -24,6 +24,9 @@ class Pedido(object):
         self.b_branco = qtd_b_branco
         self.b_preto = qtd_b_preto
 
+    def soma_qtd_pecas(self):
+        return self.b_vermelho + self.b_branco + self.b_preto
+
     def mostrar_pedido(self):
         print("%s\t%s\t%s\t%s\n" % ('Cliente', 'Bojos Vermelhos', 'Bojos Brancos', 'Bojos Pretos'))
         print("%s\t%d\t%d\t%d\n" % (self.cliente, self.b_vermelho, self.b_branco, self.b_preto))
