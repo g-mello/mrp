@@ -1,22 +1,22 @@
-#!/bin/python2.7
-
+#!/usr/bin/env python
+# -*- coding: latin-1 -*-
 '''
     Author: Guilherme Mello Oliveira    RA: 18120
     Author: Caio Silva Poli             RA: 
 '''
 
 from __future__ import print_function 
-from MRP_Package import Pedido, Estoque
+import Pedido, Estoque
 
 from math import trunc
 
 
 class Fabrica(object):
 
-    def __init__(self, cidade='São Paulo', estado='SP'):
+    def __init__(self, cidade='Sao Paulo', estado='SP'):
         self.cidade = cidade
         self.estado = estado
-        self.estoque = Estoque.Estoque_MP()
+        self.estoque = Estoque.Estoque_MP(id_estoque=1)
         self.pedido_aberto = list() 
         self.pedido_exec = list() 
 
@@ -24,20 +24,19 @@ class Fabrica(object):
         self.estoque.set_estoque(tec_v, tec_b, tec_p, espuma)
 
 
-    def add_pedido(self, *pedido):
+    def add_pedido(self, pedido):
         ''' Adiciona um pedido aos pedidos em aberto '''
-
-        p = Pedido.Pedido(pedido[0], pedido[1], pedido[2], pedido[3])
-        self.pedido_aberto.append(p)
+        #p = Pedido.Pedido(pedido[0], pedido[1], pedido[2], pedido[3])
+        self.pedido_aberto.append(pedido)
 
 
     def max_prod(self):
         '''
-        Encontra a maxima quantidade de peças que podem ser produzidas
+        Encontra a maxima quantidade de pecas que podem ser produzidas
         com a quantidade em atual no estoque
         '''
 
-        ( tec_v, tec_b, tec_p, espuma ) = self.estoque.get_estoque() 
+        ( tec_v, tec_b, tec_p, espuma ) = self.estoque.get_estoque()[1:] 
         max_placas = trunc(espuma/1.2 + ( tec_v + tec_b + tec_p)/0.4)
         max_produzidos = max_placas * 8
 
@@ -47,7 +46,7 @@ class Fabrica(object):
     def __colocar_em_exec(self):
         '''
             Verifica se tem estoque para produzir um pedido em aberto
-            inserindo-o em pedidos em execução
+            inserindo-o em pedidos em execucao
         '''
         max_produzidos = self.max_prod()
 
@@ -71,9 +70,9 @@ class Fabrica(object):
         for p in self.pedido_exec:
 
             # Quantidade de pedidos por cor
-            qtd_b_vermelho = p.b_vermelho
-            qtd_b_branco = p.b_branco 
-            qtd_b_preto = p.b_preto
+            qtd_b_vermelho = p.qtd_b_vermelho
+            qtd_b_branco = p.qtd_b_branco 
+            qtd_b_preto = p.qtd_b_preto
 
             # Quantidade de pedidos levando em consideração a margem de erro
             qtd_v_bojos_margem  = ( qtd_b_vermelho + ( qtd_b_vermelho * 0.1)) 
@@ -115,18 +114,40 @@ class Fabrica(object):
             qtd_p_tecido = 0.4 * qtd_p_placas 
 
             #Dar baixa no estoque
-            self.estoque.tec_vermelho -= qtd_v_tecido
-            self.estoque.tec_branco -= qtd_b_tecido
-            self.estoque.tec_preto -= qtd_p_tecido
+            self.estoque.qtd_tec_vermelho -= qtd_v_tecido
+            self.estoque.qtd_tec_branco -= qtd_b_tecido
+            self.estoque.qtd_tec_preto -= qtd_p_tecido
+            self.estoque.qtd_espuma -= ( qtd_v_espuma + qtd_b_espuma + qtd_p_espuma )
 
-            self.estoque.espuma -= ( qtd_v_espuma + qtd_b_espuma + qtd_p_espuma )
+            self.estoque.set_estoque(self.estoque.qtd_tec_vermelho,
+                                     self.estoque.qtd_tec_branco,
+                                     self.estoque.qtd_tec_preto,
+                                     self.estoque.espuma)
 
-            header0 = "%-10s\t%-20s\t%-20s\t%-20s\t%-20s\t%-20s\t%-20s\n" % ( "Cor","Qtd de Pedido", "Qtd Margem de Perda", "Qtd de Peças", "Qtd de Tecido", "Qtd de Espuma", "Qtd de Bojos Produzidos")
+            print("DEBUG << baixa no estoque >>")
+            print("Qtd_Tec_Verm: ", qtd_v_tecido )
+            print("Qtd_Tec_Branco: ", qtd_b_tecido )
+            print("Qtd_Tec_Preto: ", qtd_b_preto)
+            print("Qtd Espuma: ", ( qtd_v_espuma + qtd_b_espuma + qtd_p_espuma ))
+
+
+            #Marcar pedido como realizado no banco de dados
+            p.cursor.execute('''
+                                UPDATE tb_pedido
+                                SET fg_ativo = 0 
+                                WHERE id_pedido = ?
+                             ''', (p.id_pedido,)
+                    )
+
+            p.conn.commit()
+
+
+            header0 = "%-10s\t%-20s\t%-20s\t%-20s\t%-20s\t%-20s\t%-20s\n" % ( "Cor", "Qtd de Pedido", "Qtd Margem de Perda", "Qtd de Peças", "Qtd de Tecido", "Qtd de Espuma", "Qtd de Bojos Produzidos")
             header1 = "%-10s\t%-20d\t%-20d\t%-20d\t%-20.2f\t%-20.2f\t%-20d\n" % ( "Vermelho", qtd_b_vermelho, qtd_v_bojos_margem, qtd_v_placas, qtd_v_tecido, qtd_v_espuma, qtd_v_bojos_produzidos)
             header2 = "%-10s\t%-20d\t%-20d\t%-20d\t%-20.2f\t%-20.2f\t%-20d\n" % ( "Branco", qtd_b_branco, qtd_b_bojos_margem, qtd_b_placas, qtd_b_tecido, qtd_b_espuma, qtd_b_bojos_produzidos)
             header3 = "%-10s\t%-20d\t%-20d\t%-20d\t%-20.2f\t%-20.2f\t%-20d\n" % ( "Preto", qtd_b_preto, qtd_p_bojos_margem, qtd_p_placas, qtd_p_tecido, qtd_p_espuma, qtd_p_bojos_produzidos)
 
-            print("\nCliente: %s\n" % p.cliente)
+            print("\nCliente: %s\n" % p.id_cliente)
             print(header0)
             print(header1)
             print(header2)
@@ -140,17 +161,18 @@ if __name__ == '__main__':
     print("\nEstoque Inicial\n")
     minha_fabrica.estoque.mostrar_estoque()
 
-    meu_pedido_1 = Pedido.Pedido("Alan Turing", 200, 200, 0)
-    meu_pedido_2 = Pedido.Pedido("Bill Gates", 200, 200, 300)
-    meu_pedido_3 = Pedido.Pedido("Steve Jobs", 0, 650, 450)
+    meu_pedido_1 = Pedido.Pedido(1,1,500,300,0)
+    meu_pedido_2 = Pedido.Pedido(2,2,200,200,300)
+    meu_pedido_3 = Pedido.Pedido(3,3,400,650,0)
 
-    minha_fabrica.add_pedido(*meu_pedido_1.get_pedido())
-    minha_fabrica.add_pedido(*meu_pedido_2.get_pedido())
-    minha_fabrica.add_pedido(*meu_pedido_3.get_pedido())
+    minha_fabrica.add_pedido(meu_pedido_1)
+    minha_fabrica.add_pedido(meu_pedido_2)
+    minha_fabrica.add_pedido(meu_pedido_3)
     minha_fabrica.produzir()
 
-    print("\nEstoque Restante\n")
+    print("\nEstoque Final\n")
     minha_fabrica.estoque.mostrar_estoque()
+
 
 
 
