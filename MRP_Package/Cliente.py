@@ -10,9 +10,9 @@ import sqlite3
 
 class Cliente(object):
 
-    def __init__(self, id_cliente, nome="default", sobrenome="default"):
+    def __init__(self, nome="default", sobrenome="default"):
 
-        self.id_cliente = id_cliente
+        self.id_cliente = "" 
         self.nome = nome
         self.sobrenome = sobrenome
 
@@ -20,9 +20,9 @@ class Cliente(object):
         self.cursor = self.conn.cursor();
 
         self.cursor.execute('''
-                                INSERT INTO tb_cliente
+                                INSERT INTO tb_cliente( nome, sobrenome)
                                 VALUES 
-                                (?, ?, ?)''', (self.id_cliente, self.nome, self.sobrenome) 
+                                (?, ?)''', (self.nome, self.sobrenome) 
                            )
 
         self.conn.commit()
@@ -75,7 +75,7 @@ class Cliente(object):
 
 
 
-    def set_cliente(self, id_cliente, nome, sobrenome):
+    def set_cliente(self, nome, sobrenome, id_cliente):
 
         self.id_cliente = id_cliente
         self.nome = nome
@@ -93,15 +93,18 @@ class Cliente(object):
 
 
     def mostrar_cliente(self):
-        print("%s\t%s\t%s\n" % ('Id Cliente', 'Nome', 'Sobrenome'))
-        print("%d\t%s\t%s\n" % (self.id_cliente, self.nome, self.sobrenome))
+        print("%s\t%s\n" % ('Nome', 'Sobrenome'))
+        print("%s\t%s\n" % (self.nome, self.sobrenome))
 
 
 
 if __name__ == '__main__':
 
-    print(Cliente.get_clientes())
-    print(Cliente.get_id_cliente("Alan", "Turing"))
+    cliente = Cliente("Alan", "Turing")
+    cliente.mostrar_cliente()
+
+    #print(Cliente.get_clientes())
+    #print(Cliente.get_id_cliente("Alan", "Turing"))
 
 
 

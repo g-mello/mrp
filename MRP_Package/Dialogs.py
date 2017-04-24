@@ -102,6 +102,9 @@ class PedidoDialog(Gtk.Dialog, Gtk.Window):
 
 
 
+
+
+
 class AddPedidoDialog(Gtk.Dialog):
 
     def __init__(self, parent):
@@ -115,38 +118,7 @@ class AddPedidoDialog(Gtk.Dialog):
 
         # Content area (area above buttons)
         area = self.get_content_area()
-        area.add(Gtk.Label("Pedido Adicionado com Sucesso"))
+        area.add(Gtk.Label("Pedido Adicionado Com Sucesso"))
         self.show_all()
 
-class MainWindow(Gtk.Window):
 
-    def __init__(self):
-        Gtk.Window.__init__(self, title="Dialog Example")
-        self.set_default_size(200, 100)
-        self.set_border_width(30)
-
-        button = Gtk.Button("Open a PopUp")
-        button.connect("clicked", self.button_clicked)
-        self.add(button)
-
-    def button_clicked(self, widget):
-        dialog = PedidoDialog(self)
-
-        # User can't interact with main window until dialog returns something
-        response = dialog.run()
-
-        if response == Gtk.ResponseType.OK:
-            print("You clicked the OK button")
-        elif response == Gtk.ResponseType.CANCEL:
-            print("You clicked the CANCEL button")
-
-        dialog.destroy()
-
-
-
-
-if __name__ == '__main__':
-    win = MainWindow()
-    win.connect("delete-event", Gtk.main_quit)
-    win.show_all()
-    Gtk.main()

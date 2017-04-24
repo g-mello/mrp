@@ -11,8 +11,9 @@ import sqlite3
 
 class Estoque_MP(object):
 
-    def __init__(self, id_estoque, tec_vermelho=0, tec_branco=0, tec_preto=0, espuma=0.0):
-        self.id_estoque = id_estoque
+    def __init__(self, id_fabrica, tec_vermelho=0, tec_branco=0, tec_preto=0, espuma=0.0):
+
+        self.id_fabrica = id_fabrica 
         self.qtd_tec_vermelho = tec_vermelho
         self.qtd_tec_branco = tec_branco
         self.qtd_tec_preto = tec_preto
@@ -21,9 +22,10 @@ class Estoque_MP(object):
         self.cursor = self.conn.cursor()
 
         self.cursor.execute('''
-                                INSERT INTO tb_estoque
+                                INSERT INTO tb_estoque(id_fabrica, qtd_tec_verm, qtd_tec_branco, qtd_tec_preto, qtd_espuma)
                                 VALUES 
-                                (?, ?, ?, ?, ?)''', (self.id_estoque, self.qtd_tec_vermelho, self.qtd_tec_branco, self.qtd_tec_preto, self.qtd_espuma) 
+                                (?, ?, ?, ?, ?)
+                           ''', (self.id_fabrica, self.qtd_tec_vermelho, self.qtd_tec_branco, self.qtd_tec_preto, self.qtd_espuma) 
                            )
 
         self.conn.commit()
@@ -33,12 +35,13 @@ class Estoque_MP(object):
           self.cursor.execute('''
                                 SELECT * 
                                 FROM tb_estoque
-                                WHERE id_estoque = ?
-                            ''', (self.id_estoque,)
+                                WHERE id_fabrica = ?
+                            ''', (self.id_fabrica,)
                             )
 
-          (self.id_estoque, self.tec_vermelho, self.tec_branco, self.tec_preto, self.espuma) = self.cursor.fetchone()
-          return (self.id_estoque, self.tec_vermelho, self.tec_branco, self.tec_preto, self.espuma) 
+          (self.id_estoque, self.id_fabrica, self.tec_vermelho, self.tec_branco, self.tec_preto, self.espuma) = self.cursor.fetchone()
+          return (self.id_estoque, self.id_fabrica, self.tec_vermelho, self.tec_branco, self.tec_preto, self.espuma) 
+
 
 
     def set_estoque(self, tec_verm, tec_branco, tec_preto, espuma):
@@ -54,8 +57,8 @@ class Estoque_MP(object):
                                     qtd_tec_branco = ?,
                                     qtd_tec_preto = ?,
                                     qtd_espuma = ?
-                                WHERE id_estoque = ?
-                            ''', (tec_verm, tec_branco, tec_preto, espuma, self.id_estoque)
+                                WHERE id_fabrica = ?
+                            ''', (tec_verm, tec_branco, tec_preto, espuma, self.id_fabrica)
                             )
         self.conn.commit()
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: latin-1 -*-
+
 '''
     Author: Guilherme Mello Oliveira    RA: 18120
     Author: Caio Silva Poli             RA: 
@@ -9,16 +10,33 @@ from __future__ import print_function
 import Pedido, Estoque
 
 from math import trunc
+import random
+import sqlite3
 
 
 class Fabrica(object):
 
     def __init__(self, cidade='Sao Paulo', estado='SP'):
+        
+        self.id_fabrica=random.randint(0,100)
         self.cidade = cidade
         self.estado = estado
-        self.estoque = Estoque.Estoque_MP(id_estoque=1)
+        self.estoque = Estoque.Estoque_MP(id_fabrica=self.id_fabrica)
         self.pedido_aberto = list() 
         self.pedido_exec = list() 
+
+        self.conn = sqlite3.connect("/home/gmello/Projects/python/trabalho_ely_mrp/mrp/db/mrp-db.sqlite")
+        self.cursor = self.conn.cursor()
+
+        self.cursor.execute('''
+                                INSERT INTO tb_fabrica(id_fabrica,cidade,estado)
+                                VALUES
+                                (?,?,?)
+                            ''', (self.id_fabrica, self.cidade, self.estado)
+                           )
+
+        self.conn.commit()
+
 
     def set_estoque(self, tec_v, tec_b, tec_p, espuma):
         self.estoque.set_estoque(tec_v, tec_b, tec_p, espuma)
@@ -36,7 +54,7 @@ class Fabrica(object):
         com a quantidade em atual no estoque
         '''
 
-        ( tec_v, tec_b, tec_p, espuma ) = self.estoque.get_estoque()[1:] 
+        ( tec_v, tec_b, tec_p, espuma ) = self.estoque.get_estoque()[2:] 
         max_placas = trunc(espuma/1.2 + ( tec_v + tec_b + tec_p)/0.4)
         max_produzidos = max_placas * 8
 
@@ -61,13 +79,20 @@ class Fabrica(object):
                 max_produzidos -= qtd_pecas
 
 
+
     def produzir(self):
         
         ''' Produz os pedidos na lista de pedidos em execução '''
-
+        
         self.__colocar_em_exec()
 
+        dados_producao = list()
+        pedidos_producao = list()
+        dados_totais = list()
+
         for p in self.pedido_exec:
+
+            pedidos_producao.append(Pedido.Pedido.get_pedido(p.id_cliente))
 
             # Quantidade de pedidos por cor
             qtd_b_vermelho = p.qtd_b_vermelho
@@ -141,17 +166,20 @@ class Fabrica(object):
 
             p.conn.commit()
 
+            dados_producao.append([
+                                   qtd_b_vermelho + qtd_b_branco + qtd_b_preto, 
+                                   qtd_v_bojos_margem + qtd_b_bojos_margem + qtd_p_bojos_margem, 
+                                   qtd_v_placas + qtd_b_placas + qtd_p_placas, 
+                                   qtd_v_tecido + qtd_b_tecido + qtd_p_tecido, 
+                                   qtd_v_espuma + qtd_b_espuma + qtd_v_espuma , 
+                                   qtd_v_bojos_produzidos + qtd_b_bojos_produzidos + qtd_p_bojos_produzidos
+                                 ])
+        
+        dados_totais.append(pedidos_producao)    
+        dados_totais.append(dados_producao)    
 
-            header0 = "%-10s\t%-20s\t%-20s\t%-20s\t%-20s\t%-20s\t%-20s\n" % ( "Cor", "Qtd de Pedido", "Qtd Margem de Perda", "Qtd de Peças", "Qtd de Tecido", "Qtd de Espuma", "Qtd de Bojos Produzidos")
-            header1 = "%-10s\t%-20d\t%-20d\t%-20d\t%-20.2f\t%-20.2f\t%-20d\n" % ( "Vermelho", qtd_b_vermelho, qtd_v_bojos_margem, qtd_v_placas, qtd_v_tecido, qtd_v_espuma, qtd_v_bojos_produzidos)
-            header2 = "%-10s\t%-20d\t%-20d\t%-20d\t%-20.2f\t%-20.2f\t%-20d\n" % ( "Branco", qtd_b_branco, qtd_b_bojos_margem, qtd_b_placas, qtd_b_tecido, qtd_b_espuma, qtd_b_bojos_produzidos)
-            header3 = "%-10s\t%-20d\t%-20d\t%-20d\t%-20.2f\t%-20.2f\t%-20d\n" % ( "Preto", qtd_b_preto, qtd_p_bojos_margem, qtd_p_placas, qtd_p_tecido, qtd_p_espuma, qtd_p_bojos_produzidos)
+        return dados_totais 
 
-            print("\nCliente: %s\n" % p.id_cliente)
-            print(header0)
-            print(header1)
-            print(header2)
-            print(header3)
 
 
 if __name__ == '__main__':

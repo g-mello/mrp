@@ -10,11 +10,10 @@ import sqlite3
 
 class Pedido(object):
 
-    def __init__(self, id_pedido, id_cliente, b_vermelho=0, b_branco=0, b_preto=0):
+    def __init__(self, id_cliente, b_vermelho=0, b_branco=0, b_preto=0):
 
-        self.id_pedido = id_pedido 
+        self.id_pedido = "" 
         self.id_cliente = id_cliente
-
         self.qtd_b_vermelho = b_vermelho
         self.qtd_b_branco = b_branco
         self.qtd_b_preto = b_preto
@@ -24,9 +23,9 @@ class Pedido(object):
         self.cursor = self.conn.cursor();
 
         self.cursor.execute('''
-                                INSERT INTO tb_pedido
+                                INSERT INTO tb_pedido(id_cliente, qtd_bojo_vermelho, qtd_bojo_branco, qtd_bojo_preto, fg_ativo)
                                 VALUES 
-                                (?, ?, ?, ?, ?, ?)''', (self.id_pedido, self.id_cliente, self.qtd_b_vermelho, self.qtd_b_branco, self.qtd_b_preto, self.fg_ativo) 
+                                (?, ?, ?, ?, ?)''', (self.id_cliente, self.qtd_b_vermelho, self.qtd_b_branco, self.qtd_b_preto, self.fg_ativo) 
                            )
 
         self.conn.commit()
@@ -112,9 +111,10 @@ class Pedido(object):
 
 if __name__ == '__main__':
 
-    #meu_pedido1 = Pedido(1,1,10,10,10)
+    #meu_pedido1 = Pedido(1,10,10,10)
+    #meu_pedido1.mostrar_pedido()
 
-    print(Pedido.get_pedidos())
+    #print(Pedido.get_pedidos())
     print(Pedido.get_pedido(id_cliente=1))
 
 
