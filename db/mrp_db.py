@@ -48,8 +48,10 @@ cursor.execute('''
 cursor.execute('''
                 insert into tb_cliente(nome,sobrenome)
                 values
+                (?,?),
+                (?,?),
                 (?,?)
-                ''', ("Alan", "Turing")
+                ''', ("Alan", "Turing","Bill", "Gates", "Steve", "Jobs")
                )
 
 conn.commit()

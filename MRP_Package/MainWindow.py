@@ -16,11 +16,11 @@ class MainWindow(Gtk.Window):
 
         Gtk.Window.__init__(self, title="Trabalho MRP")
         self.set_border_width(30)
-        self.set_size_request(500,300)
+        self.set_size_request(800,600)
 
         self.clientes = Cliente.Cliente.get_clientes()
         self.minha_fabrica = Fabrica.Fabrica()
-        self.minha_fabrica.set_estoque(10,10,10,10)
+        self.minha_fabrica.set_estoque(40,60,50,600)
 
          # Stack - container that shows one item at a time
         main_area = Gtk.Stack()
@@ -35,10 +35,12 @@ class MainWindow(Gtk.Window):
         grid = Gtk.Grid()
         self.add(grid)
 
+
         #Layout Clientes
         #layout_clientes = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
         layout_clientes = Gtk.Grid()
-        layout_clientes.set_row_spacing(30)
+        layout_clientes.set_row_spacing(10)
+
         #layout_clientes.set_homogeneous(False)
 
 
@@ -99,7 +101,7 @@ class MainWindow(Gtk.Window):
 
             # Render means draw or display the data (just display as normal text)
             renderer = Gtk.CellRendererText()
-            renderer.set_padding(50,20)
+            renderer.set_padding(50,10)
 
             # Create columns (text is column number)
             column = Gtk.TreeViewColumn(col_title, renderer, text=i)
@@ -125,7 +127,7 @@ class MainWindow(Gtk.Window):
 
             # Render means draw or display the data (just display as normal text)
             renderer = Gtk.CellRendererText()
-            renderer.set_padding(50,20)
+            renderer.set_padding(50,10)
 
             # Create columns (text is column number)
             column = Gtk.TreeViewColumn(col_title, renderer, text=i)
@@ -149,7 +151,7 @@ class MainWindow(Gtk.Window):
 
             # Render means draw or display the data (just display as normal text)
             renderer = Gtk.CellRendererText()
-            renderer.set_padding(50,20)
+            renderer.set_padding(50,10)
 
             # Create columns (text is column number)
             column = Gtk.TreeViewColumn(col_title, renderer, text=i)
@@ -168,6 +170,7 @@ class MainWindow(Gtk.Window):
         layout_clientes.pack_start(box_pedido, True, True, 0)
         '''
 
+
         layout_clientes.attach(label_cliente,0,0,1,1) 
         layout_clientes.attach(clientes_tree_view,0,1,1,1) 
         layout_clientes.attach(button_box,0,2,1,1)
@@ -178,7 +181,6 @@ class MainWindow(Gtk.Window):
         layout_clientes.attach(self.materia_prima_tree_view,0,7,1,1) 
 
         main_area.add_titled(layout_clientes, "layout_clientes", "Clientes")
-
 
 
         #Layout Novo Pedido 
@@ -251,8 +253,8 @@ class MainWindow(Gtk.Window):
 
         #Layout Producão
         layout_producao = Gtk.Grid()
-        layout_producao.set_border_width(30)
-        layout_producao.set_row_spacing(30)
+        layout_producao.set_border_width(10)
+        layout_producao.set_row_spacing(10)
 
         label_pedidos = Gtk.Label()
         label_pedidos.set_markup(" <big><b> Pedidos Solicitados: </b></big>")
@@ -273,7 +275,7 @@ class MainWindow(Gtk.Window):
 
             # Render means draw or display the data (just display as normal text)
             renderer = Gtk.CellRendererText()
-            renderer.set_padding(50,20)
+            renderer.set_padding(50,10)
 
             # Create columns (text is column number)
             column = Gtk.TreeViewColumn(col_title, renderer, text=i)
@@ -300,7 +302,7 @@ class MainWindow(Gtk.Window):
 
             # Render means draw or display the data (just display as normal text)
             renderer = Gtk.CellRendererText()
-            renderer.set_padding(50,20)
+            renderer.set_padding(50,10)
 
             # Create columns (text is column number)
             column = Gtk.TreeViewColumn(col_title, renderer, text=i)
@@ -324,7 +326,7 @@ class MainWindow(Gtk.Window):
 
             # Render means draw or display the data (just display as normal text)
             renderer = Gtk.CellRendererText()
-            renderer.set_padding(50,20)
+            renderer.set_padding(50,10)
 
             # Create columns (text is column number)
             column = Gtk.TreeViewColumn(col_title, renderer, text=i)
@@ -345,9 +347,8 @@ class MainWindow(Gtk.Window):
         main_area.add_titled(layout_producao, "layout_producao", "Produção")
 
 
-
         grid.attach(stack_switcher, 0, 0, 1, 1)
-        grid.attach(main_area, 0, 2, 1, 1)
+        grid.attach(main_area, 0, 1, 1, 1)
 
     def buscar_pedido(self, widget):
         
